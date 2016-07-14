@@ -123,6 +123,10 @@ class TagProbeFitter {
   ///restore variables's values for fit starting point
   void varRestorer(RooWorkspace* w);
 
+
+  /// calculate the mean of a variable from a RooDataSet using a cut. The code from RooFit does not work
+  double calculateMeanOfVariable(RooDataSet* ds, RooRealVar* var, char* cut);
+  
   ///calculate the efficiecny with a simulataneous maximum likelihood fit in the dataset found in the workspace with PDF pdfName
   void doFitEfficiency(RooWorkspace* w, std::string pdfName, RooRealVar& efficiency);
 
