@@ -432,7 +432,7 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
     else {
       RooArgSet* obs = new RooArgSet;
       obs->add((*data.get(rowIndex))["_efficiencyCategory_"]);
-      obs->add(unbinnedVars);
+      obs->add(*unbinnedVars.first());
 
 
       data_binHist = new RooDataHist("data_binned", "data_binned", *obs);
