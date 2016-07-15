@@ -153,11 +153,11 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
   for(vector<string>::iterator v=unbinnedVariables.begin(); v!=unbinnedVariables.end(); v++){
     cout << "MCBS: unbinnedVariable : " << v->c_str() << endl;
     dataVars.addClone(variables[v->c_str()], true);
-    unbinnedVars.addClone(variables[v->c_str()],true);
     if (binnedFit && (v == unbinnedVariables.begin())) {
         ((RooRealVar&)dataVars[v->c_str()]).setBins(massBins);
 	cout << "MCBS: massBins = " << massBins << endl;
     }
+    unbinnedVars.addClone(dataVars[v->c_str()],true);
   }
   //collect the binned variables and the corresponding bin categories
   RooArgSet binnedVariables;
