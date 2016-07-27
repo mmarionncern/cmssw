@@ -138,7 +138,7 @@ void TagProbeFitter::setWeightVar(const std::string &var) {
 }
 
 string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<string>& effCats,const std::vector<string>& effStates, vector<string>& unbinnedVariables, map<string, vector<double> >& binnedReals, map<string, std::vector<string> >& binnedCategories, vector<string>& binToPDFmap){
-  cout << "MCBS: in TagProbeFitter::calculateEfficiency" << endl;
+  //cout << "MCBS: in TagProbeFitter::calculateEfficiency" << endl;
   //go to home directory
   outputDirectory->cd();
   //make a directory corresponding to this efficiency binning
@@ -151,32 +151,32 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
   RooArgSet unbinnedVars;
   //collect unbinned variables
   for(vector<string>::iterator v=unbinnedVariables.begin(); v!=unbinnedVariables.end(); v++){
-    cout << "MCBS: unbinnedVariable : " << v->c_str() << endl;
+    //cout << "MCBS: unbinnedVariable : " << v->c_str() << endl;
     dataVars.addClone(variables[v->c_str()], true);
     if (binnedFit && (v == unbinnedVariables.begin())) {
         ((RooRealVar&)dataVars[v->c_str()]).setBins(massBins);
-	cout << "MCBS: massBins = " << massBins << endl;
+	//cout << "MCBS: massBins = " << massBins << endl;
     }
     unbinnedVars.addClone(dataVars[v->c_str()],true);
   }
   //collect the binned variables and the corresponding bin categories
   RooArgSet binnedVariables;
   RooArgSet binCategories;
-  char cutBuffer[100];
+  //char cutBuffer[100]; // MCBS, FOR printing the bin limits below
   for(map<string, vector<double> >::iterator v=binnedReals.begin(); v!=binnedReals.end(); v++){
     TString name = v->first;
-    vector<double>& binLimits = v->second;
+    //vector<double>& binLimits = v->second; // MCBS, for printing bin limits
     if (variables.find(name) == 0) { cerr << "Binned variable '"<<name<<"' not found." << endl; return "Error"; }
     binnedVariables.addClone(variables[name]);
    ((RooRealVar&)binnedVariables[name]).setBinning( RooBinning(v->second.size()-1, &v->second[0]) );
     binCategories.addClone( RooBinningCategory(name+"_bins", name+"_bins", (RooRealVar&)binnedVariables[name]) );
-    cout << "MCBS: Binned variable " << name << " has " << binLimits.size()-1 << " bins" << endl;
-    for (size_t cutIdx = 0; cutIdx<binLimits.size()-1; ++cutIdx) {
-      sprintf(cutBuffer,"%4.2f < %s && %s < %4.2f",binLimits[cutIdx],name.Data(),name.Data(),binLimits[cutIdx+1]);
-      cout << "MCBS: " << cutBuffer << endl;
-    }
+    //cout << "MCBS: Binned variable " << name << " has " << binLimits.size()-1 << " bins" << endl;
+    // for (size_t cutIdx = 0; cutIdx<binLimits.size()-1; ++cutIdx) {
+    //   sprintf(cutBuffer,"%4.2f < %s && %s < %4.2f",binLimits[cutIdx],name.Data(),name.Data(),binLimits[cutIdx+1]);
+      //cout << "MCBS: " << cutBuffer << endl;
+    // }
       
-    ((RooBinningCategory&)binCategories[name+"_bins"]).Print(); // Print this RooBinnningCategory. MCBS
+    //((RooBinningCategory&)binCategories[name+"_bins"]).Print(); // Print this RooBinnningCategory. MCBS
   }
   dataVars.addClone(binnedVariables, true);
   
@@ -189,13 +189,13 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
     if (variables.find(name) == 0) { cerr << "Binned category '"<<name<<"' not found." << endl; return "Error"; }
     categories.addClone(variables[name]);
     mappedCategories.addClone(RooMappedCategory(name+"_bins", name+"_bins", (RooCategory&)categories[name]));
-    cout << "MCBS: Binned category " << name << ", RooMappedCategory " << name << "_bins" << endl;
-    ((RooCategory&)categories[name]).Print(); // MCBS
+    //cout << "MCBS: Binned category " << name << ", RooMappedCategory " << name << "_bins" << endl;
+    //((RooCategory&)categories[name]).Print(); // MCBS
 
 
     for(unsigned int i = 0; i<v->second.size(); i++){
       ((RooMappedCategory&)mappedCategories[name+"_bins"]).map(v->second[i].c_str(), name+"_"+TString(v->second[i].c_str()).ReplaceAll(",","_"));
-      cout << "   MCBS: mapping " << v->second[i] << " to " << name+"_"+v->second[i] << endl;
+      //cout << "MCBS: mapping " << v->second[i] << " to " << name+"_"+v->second[i] << endl;
     }
     
     // ((RooMappedCategory&)mappedCategories[name+"_bins"]).Print(); // MCBS
@@ -208,7 +208,7 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
   for (vector<string>::const_iterator effCat = effCats.begin(); effCat != effCats.end(); ++effCat) {
      if (variables.find(effCat->c_str()) != 0) {
         dataVars.addClone(variables[effCat->c_str()], true);
-	cout << "MCBS: Adding efficiency category: " << *effCat << endl;
+	//cout << "MCBS: Adding efficiency category: " << *effCat << endl;
      }
   }
 
@@ -217,14 +217,14 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
      for (vector<string>::const_iterator it = ev->second.second.begin(), ed = ev->second.second.end(); it != ed; ++it) {
        // provided that they are real variables themselves
        if (variables.find(it->c_str())) dataVars.addClone(variables[it->c_str()], true);
-       cout << "MCBS: Variable used in expression: " << *it << endl; 
+       //cout << "MCBS: Variable used in expression: " << *it << endl; 
      }
    }
    // add all real variables used in cuts
    for(vector<pair<pair<string,string>, pair<string, double> > >::const_iterator tc = thresholdCategories.begin(), tce = thresholdCategories.end(); tc != tce; ++tc){
      if (variables.find(tc->second.first.c_str())) {
        dataVars.addClone(variables[tc->second.first.c_str()], true);
-       cout << "MCBS: Variable used in cut: " << tc->second.first << ", < " << tc->first.first << "," << tc->first.second << " >" << endl;
+       //cout << "MCBS: Variable used in cut: " << tc->second.first << ", < " << tc->first.first << "," << tc->first.second << " >" << endl;
      }
    }
 
@@ -237,15 +237,16 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
    // variables used in expressions,
    // variables used in cuts
    //
-   cout << "MCBS: 1) dataVars = " << dataVars.contentsString() << endl;
+   //cout << "MCBS: 1) dataVars = " << dataVars.contentsString() << endl;
 
   //now add the necessary mass and passing variables to make the unbinned RooDataSet
+   if (!quiet) cout << "TagProbeFitter: Loading inputTree " << inputTree->GetName() << " into RooDataSet ... " << endl;
   RooDataSet data("data", "data", inputTree, 
                   dataVars,
                   /*selExpr=*/"", /*wgtVarName=*/(weightVar.empty() ? 0 : weightVar.c_str()));
 							       
   
-  cout << "MCBS: Finished building RooDataSet data with entries " << data.numEntries() << endl;
+  if (!quiet) cout << "TagProbeFitter: Finished building RooDataSet with # entries: " << data.numEntries() << endl;
    // Now add all expressions that are computed dynamically
    for(vector<pair<pair<string,string>, pair<string, vector<string> > > >::const_iterator ev = expressionVars.begin(), eve = expressionVars.end(); ev != eve; ++ev){
      RooArgList args;
@@ -253,8 +254,8 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
          args.add(dataVars[it->c_str()]);
      }
      RooFormulaVar expr(ev->first.first.c_str(), ev->first.second.c_str(), ev->second.first.c_str(), args);
-     cout << "MCBS: Adding RooFormulaVar " << expr.GetName() << ", " << expr.GetTitle() << endl;
-     cout << "MCBS:"; expr.printMetaArgs(cout); cout << endl;
+     //cout << "MCBS: Adding RooFormulaVar " << expr.GetName() << ", " << expr.GetTitle() << endl;
+     //cout << "MCBS:"; expr.printMetaArgs(cout); cout << endl;
      
      RooRealVar *col = (RooRealVar *) data.addColumn(expr);
      dataVars.addClone(*col);
@@ -266,7 +267,7 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
      tmp.addThreshold(tc->second.second, "below",0);
      RooCategory *cat = (RooCategory *) data.addColumn(tmp);
      dataVars.addClone(*cat);			
-     cout << "MCBS: RooThresholdCategory <" << tc->first.first << ", " << tc->first.second << ">  and <" << tc->second.first << ", " << tc->second.second << ">" << endl;
+     //cout << "MCBS: RooThresholdCategory <" << tc->first.first << ", " << tc->first.second << ">  and <" << tc->second.first << ", " << tc->second.second << ">" << endl;
    }
    
   //merge the bin categories to a MultiCategory for convenience
@@ -275,15 +276,15 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
 
    //MCBS: at this point, dataVars has some new expressions and categories, even after the construction
    //MCBS: of the RooDataSet. Checking:
-   cout << "MCBS: 2) dataVars = " << dataVars.contentsString() << endl;
+   //cout << "MCBS: 2) dataVars = " << dataVars.contentsString() << endl;
 
 
 
   string effName;
   //setup the efficiency category
-  cout << "MCBS: effCats.size() " << effCats.size() << endl; // MCBS
-  cout << "MCBS: effCats[0]     " << effCats[0] << endl;     // MCBS
-  cout << "MCBS: effStates[0]   " << effStates[0] << endl;   // MCBS
+  //cout << "MCBS: effCats.size() " << effCats.size() << endl; // MCBS
+  //cout << "MCBS: effCats[0]     " << effCats[0] << endl;     // MCBS
+  //cout << "MCBS: effStates[0]   " << effStates[0] << endl;   // MCBS
   if (effCats.size() == 1) {
       effName = effCats.front() + "::" + effStates.front();
       RooMappedCategory efficiencyCategory("_efficiencyCategory_", "_efficiencyCategory_", (RooCategory&)dataVars[effCats.front().c_str()], "Failed");
@@ -305,12 +306,12 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
       efficiencyCategory.map(multiState.c_str(), "Passed");
       data.addColumn( efficiencyCategory );
   }
-  cout << "MCBS: binToPDFmap[0] " << binToPDFmap[0] << endl; // set to "shape" in .py,
+  //cout << "MCBS: binToPDFmap[0] " << binToPDFmap[0] << endl; // set to "shape" in .py,
   //setup the pdf category
   RooMappedCategory pdfCategory("_pdfCategory_", "_pdfCategory_", allCats, (binToPDFmap.size()>0)?binToPDFmap[0].c_str():"all");
   for(unsigned int i = 1; i<binToPDFmap.size(); i+=2){
     pdfCategory.map(binToPDFmap[i].c_str(), binToPDFmap[i+1].c_str());
-    cout << "MCBS: Mapping " << binToPDFmap[i] << " to " << binToPDFmap[i+1] << endl;
+    //cout << "MCBS: Mapping " << binToPDFmap[i] << " to " << binToPDFmap[i+1] << endl;
   }
   data.addColumn( pdfCategory );
   
@@ -324,13 +325,13 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
   // MCBS: At this point, the RooDataSet data is completely made, including not just dataVars,
   // MCBS: but also the pdfCategory, efficiencyCategory, the RooFormulaVar from the expressions
   // MCBS: Computed dynamically (e.g. the (Tight2012==1 && abs(dzPV)<0.5) condition)
-  cout << "Finished adding columns to the RooDataSet, print it" << endl;
-  cout << "MCBS: data.numEntries() " << data.numEntries() << endl;
-  cout << "MCBS: sizeof(data) " << sizeof(data) << endl;
-  data.Print();
+  //cout << "MCBS: Finished adding columns to the RooDataSet, print it" << endl;
+  //cout << "MCBS: data.numEntries() " << data.numEntries() << endl;
+  //cout << "MCBS: sizeof(data) " << sizeof(data) << endl;
+  //data.Print();
 
   if(!floatShapeParameters){
-    cout << "MCBS: Performing first fit over whole dataset" << endl;
+    //cout << "MCBS: Performing first fit over whole dataset" << endl;
     //fitting whole dataset to get initial values for some parameters
     RooWorkspace* w = new RooWorkspace();
     w->import(data);
@@ -341,14 +342,14 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
     delete w;
   }
 
-  cout << "MCBS: Begin loop over all bins requested in Py file, using allCats" << endl;
+  //cout << "MCBS: Begin loop over all bins requested in Py file, using allCats" << endl;
   //loop over all bins with the help of allCats
   TIterator* it = allCats.typeIterator();
   for(RooCatType* t = (RooCatType*)it->Next(); t!=0; t = (RooCatType*)it->Next() ){
     //name of the multicategory
     TString catName = t->GetName();
     // MCBS: Print out the category names
-    cout << "MCBS: doing catName : " << catName <<  " t->getVal() : " << t->getVal() << endl;
+    //cout << "MCBS: doing catName : " << catName <<  " t->getVal() : " << t->getVal() << endl;
     //skip unmapped states
     if(catName.Contains("NotMapped")) continue;
     //create the dataset
@@ -357,10 +358,10 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
     // Can this be changed to use TH1s? or vectors of TH1s?
     // Here is where we will probably need to make the appropriate histograms
 
-    cout << "MCBS: This RooCatType will be fitted. Using the cut: TString::Format( allCats==%d ,t->getVal()) : " << TString::Format("allCats==%d",t->getVal()) << endl;
+    //cout << "MCBS: This RooCatType will be fitted. Using the cut: TString::Format( allCats==%d ,t->getVal()) : " << TString::Format("allCats==%d",t->getVal()) << endl;
 
 
-    cout << "MCBS: Use original dataset for setting category variables" << endl;
+    //cout << "MCBS: Use original dataset for setting category variables" << endl;
     // const RooArgSet* row = data_bin->get(); MCBS Commented
     
     // MCBS Change #1: Use original dataset
@@ -372,7 +373,7 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
     while (((RooMultiCategory*)row->find("allCats"))->getIndex()!=t->getVal()) {
       row = data.get(++rowIndex);
     }
-    cout << "MCBS: Found row " << rowIndex << " with allCats=" << ((RooMultiCategory*)row->find("allCats"))->getIndex() << endl;
+    //cout << "MCBS: Found row " << rowIndex << " with allCats=" << ((RooMultiCategory*)row->find("allCats"))->getIndex() << endl;
     //get PDF name
     TString pdfName(((RooCategory*)row->find("_pdfCategory_"))->getLabel());
     
@@ -384,8 +385,7 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
       dirName.Append("__").Append(pdfName);
     }
     
-    cout<<"MCBS: Fitting bin, this is also a lowest-level directory in output file:  " << endl
-	<<"MCBS: " << dirName << endl;
+    cout  <<  "TagProbeFitter: Fitting bin :  " << dirName << endl;
     //make a directory for each bin
     gDirectory->mkdir(dirName)->cd();
 
@@ -410,10 +410,9 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
     if (!binnedFit) { 
       data_bin = (RooDataSet*) data.reduce(Cut(TString::Format("allCats==%d",t->getVal())));
       DataNumEntries = data_bin->numEntries();
-      cout << "MCBS: data_bin has been created. How different is it from the RooDataSet from where it came?" << endl;
-      cout << "MCBS: data_bin->numEntries() " << DataNumEntries << endl;
-      cout << "MCBS: sizeof(*data_bin) " << sizeof(*data_bin) << endl;
-      data_bin->Print();
+      //cout << "MCBS: data_bin has been created. How different is it from the RooDataSet from where it came?" << endl;
+      //cout << "MCBS: data_bin->numEntries() " << DataNumEntries << endl;
+      //cout << "MCBS: sizeof(*data_bin) " << sizeof(*data_bin) << endl; data_bin->Print();
       w->import(*data_bin);
       delete data_bin; // clean up earlier
       data_bin = w->data("data"); // point to the data that's in the workspace now (saves memory)
@@ -437,8 +436,8 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
 
       data_binHist = new RooDataHist("data_binned", "data_binned", *obs);
       data_binHist->add(data, currentCut );
-      cout << "MCBS: Printing MY RooDataHist" << endl;
-      data_binHist->printMultiline(cout,0,kTRUE,"MCBS:");
+      //cout << "MCBS: Printing MY RooDataHist" << endl;
+      //data_binHist->printMultiline(cout,0,kTRUE,"MCBS:");
       
       DataNumEntries = data_binHist->sumEntries(); 
       w->import(*data_binHist); // The import command will clone and own the clone.
@@ -447,8 +446,7 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
 
     }
     
-    cout << "MCBS: created workspace with RooDataHist called 'data_binned' Print it:" << endl;
-    w->Print("t");
+    //cout << "MCBS: created workspace with RooDataHist called 'data_binned' Print it:" << endl; w->Print("t");
 
     //save the distribution of variables
     if (doSaveDistributionsPlot) saveDistributionsPlot(w);
@@ -456,7 +454,7 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
     // if(data_bin->numEntries()>0){ // MCBS: Change #6, change to not use data_bin to avoid using pointer (compiler error)
     if(DataNumEntries>0){
       //set the values of binnedVariables to the mean value in this data bin
-      cout << "MCBS: Setting means of variables for " << currentCut << endl;
+      //cout << "MCBS: Setting means of variables for " << currentCut << endl;
       RooArgSet meanOfVariables;
       RooLinkedListIter vit = binnedVariables.iterator();
       for(RooRealVar* v = (RooRealVar*)vit.Next(); v!=0; v = (RooRealVar*)vit.Next() ){
@@ -473,7 +471,7 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
 	  mean = w->data("data")->mean(*v);
 	}
 
-	cout << "MCBS: Mean " << v->GetName() << " = " << mean << endl;
+	//cout << "MCBS: Mean " << v->GetName() << " = " << mean << endl;
 	  
         RooBinning binning((RooBinning&)v->getBinning());
         int ind = binning.binNumber(mean);
@@ -481,20 +479,20 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
         newVar.setVal(mean);
         newVar.setAsymError(binning.binLow(ind)-mean, binning.binHigh(ind)-mean);
       }
-      cout << "MCBS: End of setting values of binnedVariables" << endl;
+      //cout << "MCBS: End of setting values of binnedVariables" << endl;
   
       //put an entry in the efficiency dataset
       //note that the category values are coming from data_bin->get(0)
       // meanOfVariables.addClone(*data_bin->get(0), true); // MCBS: Avoid using data_bin 
       meanOfVariables.addClone(*(data.get(rowIndex)), true); 
       
-      cout << "MCBS: Calling doFitEfficiency" << endl;
+      //cout << "MCBS: Calling doFitEfficiency" << endl;
       efficiency.setVal(0);//reset
       efficiency.setAsymError(0,0);
       doFitEfficiency(w, pdfName.Data(), efficiency);
       fitEfficiency.add( RooArgSet(meanOfVariables, efficiency) );
 
-      cout << "MCBS: After doFitEfficiency, fitEfficiency.add" << endl;
+      //cout << "MCBS: After doFitEfficiency, fitEfficiency.add" << endl;
 /*      efficiency.setVal(0);//reset
       doSBSEfficiency(w, efficiency);
       sbsEfficiency.add( RooArgSet(meanOfVariables, efficiency) );*/
@@ -504,9 +502,6 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
       doCntEfficiency(w, efficiency);
       cntEfficiency.add( RooArgSet(meanOfVariables, efficiency) );
     }
-    // MCBS: delete data_bin, since this is the last time it is used is in the previous code block
-    // cout << "MCBS: Deleting data_bin" << endl; // MCBS
-    // delete data_bin; // MCBS
 
     //save the workspace if requested
     if(saveWorkspace){
@@ -531,7 +526,7 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
   saveEfficiencyPlots(sbsEfficiency, effCat+"::"+effState, binnedVariables, mappedCategories);
   gDirectory->cd("..");*/
 
-  //MCBS: Comment out cntEfficiency
+
   cntEfficiency.Write();
   gDirectory->mkdir("cnt_eff_plots")->cd();
   saveEfficiencyPlots(cntEfficiency, effName, binnedVariables, mappedCategories);
@@ -557,13 +552,13 @@ double TagProbeFitter::calculateMeanOfVariable(RooDataSet* ds, RooRealVar* var, 
     theSum += ds->weight() * varPtr->getVal();
     sumEntries++;
   }// loop over the rows/entries of the dataset
-  // cout << "MCBS:     theSum = " << theSum << endl;
-  // cout << "MCBS: sumEntries = " << sumEntries << endl;
+  // //cout << "MCBS:     theSum = " << theSum << endl;
+  // //cout << "MCBS: sumEntries = " << sumEntries << endl;
   
   return (sumEntries>0) ? theSum/sumEntries : 0;
 }
 void TagProbeFitter::doFitEfficiency(RooWorkspace* w, string pdfName, RooRealVar& efficiency){
-  cout << "MCBS: Inside doFitEfficiency" << endl;
+  //cout << "MCBS: Inside doFitEfficiency" << endl;
   //if pdfName is empty skip the fit
   if(pdfName == "all"){
     return;
@@ -583,9 +578,9 @@ void TagProbeFitter::doFitEfficiency(RooWorkspace* w, string pdfName, RooRealVar
 
   RooAbsData *data = w->data("data");
   std::auto_ptr<RooDataHist> bdata; 
-  cout << "MCBS: Check binnedFit " << binnedFit << endl;
+  //cout << "MCBS: Check binnedFit " << binnedFit << endl;
   if (binnedFit) { 
-    cout << "MCBS: Doing binned fit!" << endl;
+    //cout << "MCBS: Doing binned fit!" << endl;
     // get variables from data, which contain also other binning or expression variables
     
     // MCBS: Change #3, Do not create the RooDataHist here.
@@ -596,11 +591,11 @@ void TagProbeFitter::doFitEfficiency(RooWorkspace* w, string pdfName, RooRealVar
     // MCBS: Begin commenting out blockCreateHistogram:
 
     // const RooArgSet *dataObs = data->get(0); 
-    // cout << "MCBS: print out dataObs, obtained from data->get(0)" << endl;
+    // //cout << "MCBS: print out dataObs, obtained from data->get(0)" << endl;
     // dataObs->Print();
     // // remove everything which is not a dependency of the pdf
     // RooArgSet *obs = w->pdf("simPdf")->getObservables(dataObs);
-    // cout << "MCBS: obs is used for creating the RooDataHist, print it" << endl;
+    // //cout << "MCBS: obs is used for creating the RooDataHist, print it" << endl;
     // obs->Print();
     // bdata.reset(new RooDataHist("data_binned", "data_binned", *obs, *data)); 
     // //binnedW->import(*bdata); //MCBS: changed from w to binnedW, use workspace with only RooDataHist
@@ -613,24 +608,21 @@ void TagProbeFitter::doFitEfficiency(RooWorkspace* w, string pdfName, RooRealVar
     // MCBS: Replacement code to set the pointer to the RooDataHist:
     data = w->data("data_binned");
     
-    cout << "MCBS: check created RooDataHist by using printMultiline" << endl;
-    data->printMultiline(cout,0,kTRUE,"MCBS:");
+    //cout << "MCBS: check created RooDataHist by using printMultiline" << endl; data->printMultiline(cout,0,kTRUE,"MCBS:");
   }
   // MCBS: End of original code block.
   
   double totPassing = data->sumEntries("_efficiencyCategory_==_efficiencyCategory_::Passed");
   double totFailing = data->sumEntries("_efficiencyCategory_==_efficiencyCategory_::Failed");
 
-  cout << "MCBS: After the workspace has imported the RooDataHist for this binned fit, Print workspace" << endl;
-  w->Print("t");// MCBS
+  //cout << "MCBS: After the workspace has imported the RooDataHist for this binned fit, Print workspace" << endl; w->Print("t");// MCBS
 
 
-  cout << "MCBS: totPassing " << totPassing << ", totFailing " << totFailing << endl;
+  //cout << "MCBS: totPassing " << totPassing << ", totFailing " << totFailing << endl;
   
-  cout << "MCBS: Creating simNLL as RooAbsReal, and passing it to RooMinimizer and RooMiniut" << endl;
-  cout << "MCBS: simNLL is created based on *data, which will be a RooDataHist if binnedFit is true" << endl;
-  cout << "MCBS: Print out data object, which has name " << data->GetName() << endl;
-  data->Print();
+  //cout << "MCBS: Creating simNLL as RooAbsReal, and passing it to RooMinimizer and RooMiniut" << endl;
+  //cout << "MCBS: simNLL is created based on *data, which will be a RooDataHist if binnedFit is true" << endl;
+  //cout << "MCBS: Print out data object, which has name " << data->GetName() << endl; data->Print();
 
   RooAbsReal* simNLL = w->pdf("simPdf")->createNLL(*data,Extended(true),NumCPU(numCPU));
 
@@ -640,7 +632,7 @@ void TagProbeFitter::doFitEfficiency(RooWorkspace* w, string pdfName, RooRealVar
   minuit.setProfile(true);
   RooProfileLL profileLL("simPdfNLL","",*simNLL,*w->var("efficiency"));
 
-  cout << "MCBS:After constructing RooMinuit" << endl;  
+  //cout << "MCBS:After constructing RooMinuit" << endl;  
 
   //******* The block of code below is to make the fit converge faster.
   // ****** This part is OPTIONAL, i.e., off be default. User can activate this
@@ -657,7 +649,7 @@ void TagProbeFitter::doFitEfficiency(RooWorkspace* w, string pdfName, RooRealVar
   ///              Perform a global fit to the whole sample, save the fitted values of the 
   ///              user specified parameters, and fix them for bin-by-bin fit. 
 
-  cout << "MCBS: fixVars.empty() " << fixVars.empty() << endl;
+  //cout << "MCBS: fixVars.empty() " << fixVars.empty() << endl;
 
   if(!fixVars.empty()){
     // calculate initial values for parameters user want to fix
@@ -695,7 +687,7 @@ void TagProbeFitter::doFitEfficiency(RooWorkspace* w, string pdfName, RooRealVar
     // here we can use initial values if we want (this works for each bin)
     if(!floatShapeParameters) varRestorer(w);  //restore vars
 
-    cout << "MCBS: Calling minimize, minuit.migrad, and minuit.hesse. 2nd time (fixvars not empty() )" << endl;
+    //cout << "MCBS: Calling minimize, minuit.migrad, and minuit.hesse. 2nd time (fixvars not empty() )" << endl;
     //do fit
     minimizer.minimize("Minuit2","Scan");
     minuit.migrad();
@@ -718,7 +710,7 @@ void TagProbeFitter::doFitEfficiency(RooWorkspace* w, string pdfName, RooRealVar
     //release vars
     varFixer(w,false);
     
-    cout << "MCBS: Calling minimize, minuit.migrad, and minuit.hesse. 3d time (floatShapeParameters == true) " << endl;
+    //cout << "MCBS: Calling minimize, minuit.migrad, and minuit.hesse. 3d time (floatShapeParameters == true) " << endl;
     //do fit
     minimizer.minimize("Minuit2","Scan");
     minuit.migrad();
@@ -771,9 +763,9 @@ void TagProbeFitter::doFitEfficiency(RooWorkspace* w, string pdfName, RooRealVar
 
 void TagProbeFitter::createPdf(RooWorkspace* w, vector<string>& pdfCommands){
   // create the signal and background pdfs defined by the user
-  cout << "MCBS: inside createPdf" <<  endl;
+  //cout << "MCBS: inside createPdf" <<  endl;
   for(unsigned int i=0; i<pdfCommands.size(); i++){
-    cout << "MCBS: pdfCommands[" << i << "] = " << pdfCommands[i] << endl;
+    //cout << "MCBS: pdfCommands[" << i << "] = " << pdfCommands[i] << endl;
     const std::string & command = pdfCommands[i];
     if (command.find("#import ") == 0) {
         TDirectory *here = gDirectory;
@@ -785,7 +777,7 @@ void TagProbeFitter::createPdf(RooWorkspace* w, vector<string>& pdfCommands){
       here->cd();
     }
   }
-  cout << "MCBS: end of loop of pdfCommands in createPdf" << endl;
+  //cout << "MCBS: end of loop of pdfCommands in createPdf" << endl;
   // setup the simultaneous extended pdf
 
   w->factory("expr::nSignalPass('efficiency*fSigAll*numTot', efficiency, fSigAll[.9,0,1],numTot[1,0,1e10])");
