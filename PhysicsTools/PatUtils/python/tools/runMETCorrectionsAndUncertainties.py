@@ -448,6 +448,7 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
             getattr(process, "patPFMet"+postfix).srcPFCands = self._parameters["pfCandCollection"].value
         
         if self._parameters["runOnData"].value:
+            print " ============================== running on data!!!!!!!!! "
             getattr(process, "patPFMet"+postfix).addGenMET  = False
            
             
@@ -996,6 +997,20 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
                                                             metModName, varType, metUncSequence, postfix)
 
         return shiftedMetProducers
+
+#========================================================================================
+    def copyCentralMETProducer(self, process, shiftedCollModules, identifier, metModName, varType, postfix):
+        
+        # remove the postfix to put it at the end
+        shiftedMetProducers = {}
+        baseName = self.removePostfix(metModName, postfix)
+        for mod in shiftedCollModules.keys():
+            modName = baseName+identifier+varType+mod+postfix
+            shiftedMETModule = getattr(process, metModName).clone()
+            shiftedMetProducers[ modName ] = shiftedMETModule
+
+        return shiftedMetProducers
+
 
 #========================================================================================
     def copyCentralMETProducer(self, process, shiftedCollModules, identifier, metModName, varType, postfix):
