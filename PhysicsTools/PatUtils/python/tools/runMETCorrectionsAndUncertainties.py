@@ -1027,6 +1027,20 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
 
 
 #========================================================================================
+    def copyCentralMETProducer(self, process, shiftedCollModules, identifier, metModName, varType, postfix):
+        
+        # remove the postfix to put it at the end
+        shiftedMetProducers = {}
+        baseName = self.removePostfix(metModName, postfix)
+        for mod in shiftedCollModules.keys():
+            modName = baseName+identifier+varType+mod+postfix
+            shiftedMETModule = getattr(process, metModName).clone()
+            shiftedMetProducers[ modName ] = shiftedMETModule
+
+        return shiftedMetProducers
+
+
+#========================================================================================
     def createShiftedJetResModule(self, process, smear, objectCollection, varyByNsigmas, varDir, postfix ):
         
         smearedJetModule = self.createSmearedJetModule(process, objectCollection, smear, varyByNsigmas, varDir, postfix)
