@@ -8,6 +8,8 @@ namespace {
   }
 }
 
+typedef edm::ValueMap<reco::PhotonRef> PhotonRefMap;
+typedef edm::ValueMap<bool>            BoolMap;
 
 GEDPhotonGSCrysFixer::GEDPhotonGSCrysFixer( const edm::ParameterSet & pset )
 {
@@ -30,6 +32,8 @@ GEDPhotonGSCrysFixer::GEDPhotonGSCrysFixer( const edm::ParameterSet & pset )
   }
 
   produces<reco::PhotonCollection >();
+  produces<PhotonRefMap>();
+  produces<BoolMap>();
 }
 
 namespace {
@@ -63,7 +67,10 @@ void GEDPhotonGSCrysFixer::produce( edm::Event & iEvent, const edm::EventSetup &
   auto& ebRecHits = *getHandle(iEvent,ebRecHitsToken_);
   auto& newCoresToOldCoresMap = *getHandle(iEvent,newCoresToOldCoresMapToken_);
   auto newCoresHandle = getHandle(iEvent,newCoresToken_);
-  
+
+  std::vector<reco::PhotonRef> oldPhotons;
+  std::vector<bool>            isUpdated;
+
   for(size_t phoNr=0;phoNr<phosHandle->size();phoNr++){
     reco::PhotonRef phoRef(phosHandle,phoNr);
   
@@ -90,12 +97,24 @@ void GEDPhotonGSCrysFixer::produce( edm::Event & iEvent, const edm::EventSetup &
       }
 
       outPhos->push_back(newPho);
+      isUpdated.emplace_back(true);
     }else{
       outPhos->push_back(*phoRef);
+      isUpdated.emplace_back(false);
     }
   }
   
-  iEvent.put(std::move(outPhos));
+  auto&& newPhotonsHandle(iEvent.put(std::move(outPhos)));
+  std::unique_ptr<PhotonRefMap> pRefMap(new PhotonRefMap);
+  PhotonRefMap::Filler refMapFiller(*pRefMap);
+  std::unique_ptr<BoolMap> bRefMap(new BoolMap);
+  BoolMap::Filler boolMapFiller(*bRefMap);
+  refMapFiller.insert(newPhotonsHandle, oldPhotons.begin(), oldPhotons.end());
+  refMapFiller.fill();
+  boolMapFiller.insert(newPhotonsHandle, isUpdated.begin(), isUpdated.end());
+  boolMapFiller.fill();
+  iEvent.put(std::move(pRefMap));
+  iEvent.put(std::move(bRefMap));
 }
 
 void GEDPhotonGSCrysFixer::beginLuminosityBlock(edm::LuminosityBlock const& lb, 
