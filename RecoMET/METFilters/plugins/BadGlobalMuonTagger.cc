@@ -51,7 +51,9 @@ BadGlobalMuonTagger::BadGlobalMuonTagger(const edm::ParameterSet & iConfig) :
     muons_(consumes<edm::View<reco::Muon>>(iConfig.getParameter<edm::InputTag>("muons"))),
     vtx_(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("vtx"))),
     ptCut_(iConfig.getParameter<double>("muonPtCut")),
-    selectClones_(iConfig.getParameter<bool>("selectClones"))
+    selectClones_(iConfig.getParameter<bool>("selectClones")),
+    taggingMode_(iConfig.getParameter<bool> ("taggingMode")),
+    verbose_(iConfig.getUntrackedParameter<bool> ("verbose",false))
 {
     produces<edm::PtrVector<reco::Muon>>("bad");
 }
