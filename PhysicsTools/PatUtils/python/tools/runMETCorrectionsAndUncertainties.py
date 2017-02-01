@@ -252,7 +252,7 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
 
         #jet collection overloading for automatic jet reclustering or JEC application
         if reclusterJets:
-            self.setParameter('jetCollectionUnskimmed',cms.InputTag('patJets'))
+            self.setParameter('jetCollectionUnskimmed',cms.InputTag('patJets'+postfix))
             
         self.apply(process)
         
