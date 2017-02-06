@@ -215,6 +215,7 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
         self.setParameter('addToPatDefaultSequence',addToPatDefaultSequence),
         self.setParameter('jetSelection',jetSelection),
         self.setParameter('recoMetFromPFCs',recoMetFromPFCs),
+        self.setParameter('reclusterJets',reclusterJets),
         self.setParameter('reapplyJEC',reapplyJEC),
         self.setParameter('runOnData',runOnData),
         self.setParameter('onMiniAOD',onMiniAOD),
@@ -1012,34 +1013,6 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
 
 
 #========================================================================================
-    def copyCentralMETProducer(self, process, shiftedCollModules, identifier, metModName, varType, postfix):
-        
-        # remove the postfix to put it at the end
-        shiftedMetProducers = {}
-        baseName = self.removePostfix(metModName, postfix)
-        for mod in shiftedCollModules.keys():
-            modName = baseName+identifier+varType+mod+postfix
-            shiftedMETModule = getattr(process, metModName).clone()
-            shiftedMetProducers[ modName ] = shiftedMETModule
-
-        return shiftedMetProducers
-
-
-#========================================================================================
-    def copyCentralMETProducer(self, process, shiftedCollModules, identifier, metModName, varType, postfix):
-        
-        # remove the postfix to put it at the end
-        shiftedMetProducers = {}
-        baseName = self.removePostfix(metModName, postfix)
-        for mod in shiftedCollModules.keys():
-            modName = baseName+identifier+varType+mod+postfix
-            shiftedMETModule = getattr(process, metModName).clone()
-            shiftedMetProducers[ modName ] = shiftedMETModule
-
-        return shiftedMetProducers
-
-
-#========================================================================================
     def createShiftedJetResModule(self, process, smear, objectCollection, varyByNsigmas, varDir, postfix ):
         
         smearedJetModule = self.createSmearedJetModule(process, objectCollection, smear, varyByNsigmas, varDir, postfix)
@@ -1446,14 +1419,12 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
                                                                      src = pfCandCollection ) )
                 process.load("CommonTools.ParticleFlow.pfNoPileUpJME_cff")
                 configtools.cloneProcessingSnippet(process, getattr(process,"pfNoPileUpJMESequence"), postfix )
-                getattr(process, "pfPileUpJME"+postfix).PFCandidates = cms.InputTag("tmpPFCandCollPtr")
-                pfCHS = getattr(process, "pfNoPileUpJME").clone( bottomCollection = cms.InputTag("tmpPFCandCollPtr") )
-            
-            if not hasattr(process, "pfCHS"+postfix):
-                setattr(process,"pfCHS"+postfix,pfCHS)
-                patMetModuleSequence += getattr(process, "pfCHS"+postfix)
-            pfCandColl = cms.InputTag("pfCHS"+postfix)
-                   
+                getattr(process, "pfPileUpJME"+postfix).PFCandidates = cms.InputTag("tmpPFCandCollPtr"+postfix)
+                setattr(process, "pfNoPileUpJME"+postfix,
+                        getattr(process, "pfNoPileUpJME"+postfix).clone( 
+                        bottomCollection = cms.InputTag("tmpPFCandCollPtr"+postfix) )
+                        )
+                pfCandColl = cms.InputTag("pfNoPileUpJME"+postfix)
 
         jetColName+=postfix
         if not hasattr(process, jetColName):
