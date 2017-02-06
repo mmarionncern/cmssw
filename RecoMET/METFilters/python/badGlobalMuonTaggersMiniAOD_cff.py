@@ -6,7 +6,7 @@ badGlobalMuonTaggerMAOD = cms.EDFilter("BadGlobalMuonTagger",
     muonPtCut = cms.double(20),
     selectClones = cms.bool(False),
 )
-cloneGlobalMuonTaggerMAOD = badGlobalMuonTagger.clone(
+cloneGlobalMuonTaggerMAOD = badGlobalMuonTaggerMAOD.clone(
     selectClones = True
 )
 
