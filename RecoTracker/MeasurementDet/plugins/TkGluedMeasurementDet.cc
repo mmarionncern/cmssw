@@ -145,8 +145,27 @@ bool TkGluedMeasurementDet::measurements( const TrajectoryStateOnSurface& stateO
 
    //LogDebug("TkStripMeasurementDet") << "No hit found on TkGlued. Testing strips...  ";
    const BoundPlane &gluedPlane = geomDet().surface();
-   if (  // sorry for the big IF, but I want to exploit short-circuiting of logic
-       stateOnThisDet.hasError() && ( /* do this only if the state has uncertainties, otherwise it will throw 
+   bool addMissingHit = false;
+   if(est.minPt2ForHitRecoveryInGluedDet() < 1e9f) {// HIP mitigation is active
+     // sorry for duplicating the big IF below, but to keep exloiting
+     // short-circuiting logic that's the easiest
+     addMissingHit = stateOnThisDet.hasError() && ( /* do this only if the state has uncertainties, otherwise it will throw 
+                                                       (states without uncertainties are passed to this code from seeding */
+				     (theMonoDet->isActive(data) && 
+				      (theMonoDet->hasAllGoodChannels() || 
+				       testStrips(stateOnThisDet,gluedPlane,*theMonoDet)
+				       )
+				      ) /*Mono OK*/ &&
+				     (theStereoDet->isActive(data) && 
+				      (theStereoDet->hasAllGoodChannels() || 
+				       testStrips(stateOnThisDet,gluedPlane,*theStereoDet)
+				       )
+				      ) /*Stereo OK*/ 
+				      ); /* State has errors */
+   }
+   else {
+     // sorry for the big IF, but I want to exploit short-circuiting of logic
+     addMissingHit = stateOnThisDet.hasError() && ( /* do this only if the state has uncertainties, otherwise it will throw 
 					 (states without uncertainties are passed to this code from seeding */
 				     (theMonoDet->isActive(data) && 
 				      (theMonoDet->hasAllGoodChannels() || 
@@ -159,8 +178,9 @@ bool TkGluedMeasurementDet::measurements( const TrajectoryStateOnSurface& stateO
 				       testStrips(stateOnThisDet,gluedPlane,*theStereoDet)
 				       )
 				      ) /*Stereo OK*/ 
-				      ) /* State has errors */
-	 ) {
+				      ); /* State has errors */
+   }
+   if(addMissingHit) {
      result.add(theMissingHit, 0.F);
      return false;
    } 

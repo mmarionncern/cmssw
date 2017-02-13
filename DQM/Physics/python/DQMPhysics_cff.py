@@ -35,6 +35,10 @@ dqmPhysics = cms.Sequence( bphysicsOniaDQM
                            *ExoticaDQM
                            *B2GDQM
                            )
+from Configuration.StandardSequences.Eras import eras
+dqmPhysicspA  =  dqmPhysics.copy()
+dqmPhysicspA += CentralitypADQM
+eras.pA_2016.toReplaceWith(dqmPhysics, dqmPhysicspA)
 
 from Configuration.Eras.Modifier_phase1Pixel_cff import phase1Pixel
 phase1Pixel.toReplaceWith(dqmPhysics, dqmPhysics.copyAndExclude([ # FIXME

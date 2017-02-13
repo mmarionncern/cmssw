@@ -111,5 +111,4 @@ liteDQMOfflineHeavyIons = cms.Sequence ( DQMOfflineHeavyIons )
 liteDQMOfflineHeavyIons.remove( SiStripMonitorCluster )
 liteDQMOfflineHeavyIons.remove( jetMETDQMOfflineSource )
 
-
 #DQMOfflineHeavyIonsPhysics = cms.Sequence( dqmPhysics )

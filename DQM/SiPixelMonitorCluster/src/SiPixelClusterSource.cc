@@ -74,6 +74,7 @@ SiPixelClusterSource::SiPixelClusterSource(const edm::ParameterSet& iConfig) :
    digisrcToken_ = consumes<edm::DetSetVector<PixelDigi> >(conf_.getParameter<edm::InputTag>("digisrc"));
    firstRun = true;
    topFolderName_ = conf_.getParameter<std::string>("TopFolderName");
+
 }
 
 

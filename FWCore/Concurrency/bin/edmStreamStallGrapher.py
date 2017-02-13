@@ -183,6 +183,9 @@ def parseTracerOutput(f):
     return (processingSteps,numStreams,maxNameSize)
 
 
+#Special names
+kSourceFindEvent = "sourceFindEvent"
+
 #----------------------------------------------
 def chooseParser(inputFile):
     firstLine = inputFile.readline().rstrip()

@@ -68,7 +68,7 @@ void SiStripQualityChecker::bookStatus(DQMStore* dqm_store) {
     // Non Standard Plots and should be put outside EventInfo folder
 
     dqm_store->setCurrentFolder(strip_dir+"/MechanicalView"); 
-      
+
     std::string hname, htitle;
     hname  = "detFractionReportMap";
     htitle = "SiStrip Report for Good Detector Fraction";
@@ -410,9 +410,9 @@ void SiStripQualityChecker::getModuleStatus(DQMStore* dqm_store, std::vector<Mon
       std::map<uint32_t,uint16_t>::iterator iPos = bad_modules.find(detId);
       uint16_t flag;
       if (iPos != bad_modules.end()){
-	flag = iPos->second;
-	SiStripUtility::setBadModuleFlag(name,flag);            
-	iPos->second = flag;
+        flag = iPos->second;
+        SiStripUtility::setBadModuleFlag(name,flag);            
+        iPos->second = flag;
       } else {
         //  
 	//if not in the local bad module list, check the BadModuleList dir  

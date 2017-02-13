@@ -118,3 +118,5 @@ l1t::RegionalMuonCand MakeRegionalCand(float pt, int phi, int theta,
   return Cand;
   
 }
+
+#endif

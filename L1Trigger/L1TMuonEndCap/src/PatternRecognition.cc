@@ -10,16 +10,16 @@
 
 //hardcoded pattern definitions
 #define PATTERN_SIZE 9
-const PhiMemoryImage pattern1 (0x8000,0,0,0x8000,0,0,0x8000,0,0,0x8000,0,0);
-const PhiMemoryImage pattern2 (0x10000,0,0,0x8000,0,0,0xc000,0,0,0xc000,0,0);
-const PhiMemoryImage pattern3 (0x4000,0,0,0x8000,0,0,0x18000,0,0,0x18000,0,0);
-const PhiMemoryImage pattern4 (0x60000,0,0,0x8000,0,0,0xe000,0,0,0xe000,0,0);
-const PhiMemoryImage pattern5 (0x3000,0,0,0x8000,0,0,0x78000,0,0,0x78000,0,0);
-const PhiMemoryImage pattern6 (0x780000,0,0,0x8000,0,0,0xff00,0,0,0xff00,0,0);
-const PhiMemoryImage pattern7 (0xf00,0,0,0x8000,0,0,0x7f8000,0,0,0x7f8000,0,0);
-const PhiMemoryImage pattern8 (0x7f800000,0,0,0x8000,0,0,0xff00,0,0,0xff00,0,0);//
-const PhiMemoryImage pattern9 (0xff,0,0,0x8000,0,0,0x7f8000,0,0,0x7f8000,0,0);
-const PhiMemoryImage patterns[PATTERN_SIZE] = {pattern8, pattern9, pattern6, pattern7, pattern4, pattern5, pattern2, pattern3, pattern1};
+PhiMemoryImage pattern1 (0x8000,0,0,0x8000,0,0,0x8000,0,0,0x8000,0,0);
+PhiMemoryImage pattern2 (0x10000,0,0,0x8000,0,0,0xc000,0,0,0xc000,0,0);
+PhiMemoryImage pattern3 (0x4000,0,0,0x8000,0,0,0x18000,0,0,0x18000,0,0);
+PhiMemoryImage pattern4 (0x60000,0,0,0x8000,0,0,0xe000,0,0,0xe000,0,0);
+PhiMemoryImage pattern5 (0x3000,0,0,0x8000,0,0,0x78000,0,0,0x78000,0,0);
+PhiMemoryImage pattern6 (0x780000,0,0,0x8000,0,0,0xff00,0,0,0xff00,0,0);
+PhiMemoryImage pattern7 (0xf00,0,0,0x8000,0,0,0x7f8000,0,0,0x7f8000,0,0);
+PhiMemoryImage pattern8 (0x7f800000,0,0,0x8000,0,0,0xff00,0,0,0xff00,0,0);//
+PhiMemoryImage pattern9 (0xff,0,0,0x8000,0,0,0x7f8000,0,0,0x7f8000,0,0);
+PhiMemoryImage patterns[PATTERN_SIZE] = {pattern8, pattern9, pattern6, pattern7, pattern4, pattern5, pattern2, pattern3, pattern1};
  
 PatternOutput DetectPatterns(ZonesOutput Eout){
   

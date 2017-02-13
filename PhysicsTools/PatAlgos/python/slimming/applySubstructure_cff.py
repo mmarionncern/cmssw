@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-def applySubstructure( process ) :
+def applySubstructure( process, postfix="" ) :
 
     from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
 
@@ -8,14 +8,14 @@ def applySubstructure( process ) :
     from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cfi import _patJets as patJetsDefault
 
     #add AK8
-    addJetCollection(process, labelName = 'AK8',
-                     jetSource = cms.InputTag('ak8PFJetsCHS'),
+    addJetCollection(process, postfix=postfix, labelName = 'AK8',
+                     jetSource = cms.InputTag('ak8PFJetsCHS'+postfix),
                      algo= 'AK', rParam = 0.8,
                      jetCorrections = ('AK8PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
                      genJetCollection = cms.InputTag('slimmedGenJetsAK8')
                      )
-    process.patJetsAK8.userData.userFloats.src = [] # start with empty list of user floats
-    process.selectedPatJetsAK8.cut = cms.string("pt > 170")
+    getattr(process, "patJetsAK8"+postfix).userData.userFloats.src = [] # start with empty list of user floats
+    getattr(process,"selectedPatJetsAK8"+postfix).cut = cms.string("pt > 170")
 
 
     ## AK8 groomed masses
@@ -29,11 +29,13 @@ def applySubstructure( process ) :
 
 
     # add Njetiness
-    process.load('RecoJets.JetProducers.nJettinessAdder_cfi')
-    process.NjettinessAK8 = process.Njettiness.clone()
-    process.NjettinessAK8.src = cms.InputTag("ak8PFJetsCHS")
-    process.NjettinessAK8.cone = cms.double(0.8)
-    process.patJetsAK8.userData.userFloats.src += ['NjettinessAK8:tau1','NjettinessAK8:tau2','NjettinessAK8:tau3']
+    from RecoJets.JetProducers.nJettinessAdder_cfi import Njettiness
+    #process.load('RecoJets.JetProducers.nJettinessAdder_cfi')
+    setattr(process,"NjettinessAK8"+postfix, Njettiness.clone(
+            src = cms.InputTag("ak8PFJetsCHS"+postfix),
+            cone = cms.double(0.8) )
+            )
+    getattr(process, "patJetsAK8"+postfix).userData.userFloats.src += ['NjettinessAK8'+postfix+':tau1','NjettinessAK8'+postfix+':tau2','NjettinessAK8'+postfix+':tau3']
 
 
 
@@ -45,15 +47,15 @@ def applySubstructure( process ) :
     process.ak8PFJetsPuppi.doAreaFastjet = True # even for standard ak8PFJets this is overwritten in RecoJets/Configuration/python/RecoPFJets_cff
 
         
-    addJetCollection(process, labelName = 'AK8Puppi',
-                     jetSource = cms.InputTag('ak8PFJetsPuppi'),
+    addJetCollection(process, postfix=postfix,labelName = 'AK8Puppi',
+                     jetSource = cms.InputTag('ak8PFJetsPuppi'+postfix),
                      algo= 'AK', rParam = 0.8,
                      jetCorrections = ('AK8PFPuppi', cms.vstring(['L2Relative', 'L3Absolute']), 'None'),
                      btagDiscriminators = ([x.getModuleLabel() for x in patJetsDefault.discriminatorSources] + ['pfBoostedDoubleSecondaryVertexAK8BJetTags']),
                      genJetCollection = cms.InputTag('slimmedGenJetsAK8')
                      )
-    process.patJetsAK8Puppi.userData.userFloats.src = [] # start with empty list of user floats
-    process.selectedPatJetsAK8Puppi.cut = cms.string("pt > 170")
+    getattr(process,"patJetsAK8Puppi"+postfix).userData.userFloats.src = [] # start with empty list of user floats
+    getattr(process,"selectedPatJetsAK8Puppi"+postfix).cut = cms.string("pt > 170")
 
 
     from RecoJets.JetAssociationProducers.j2tParametersVX_cfi import j2tParametersVX
@@ -69,10 +71,16 @@ def applySubstructure( process ) :
 
     ## AK8 groomed masses
     from RecoJets.Configuration.RecoPFJets_cff import ak8PFJetsPuppiSoftDrop
-    process.ak8PFJetsPuppiSoftDrop = ak8PFJetsPuppiSoftDrop.clone()
-    process.load("RecoJets.JetProducers.ak8PFJetsPuppi_groomingValueMaps_cfi")
-    process.patJetsAK8Puppi.userData.userFloats.src += ['ak8PFJetsPuppiSoftDropMass']
-    process.patJetsAK8Puppi.addTagInfos = cms.bool(False)
+    setattr(process,"ak8PFJetsPuppiSoftDrop"+postfix, ak8PFJetsPuppiSoftDrop.clone(
+            src = cms.InputTag("puppi"+postfix),
+            ) )
+    from RecoJets.JetProducers.ak8PFJetsPuppi_groomingValueMaps_cfi import ak8PFJetsPuppiSoftDropMass
+    setattr(process, "ak8PFJetsPuppiSoftDropMass"+postfix, ak8PFJetsPuppiSoftDropMass.clone(
+            src = cms.InputTag("ak8PFJetsPuppi"+postfix),
+            matched = cms.InputTag("ak8PFJetsPuppiSoftDrop"+postfix), 
+            ) )
+    getattr(process,"patJetsAK8Puppi"+postfix).userData.userFloats.src += ['ak8PFJetsPuppiSoftDropMass'+postfix]
+    getattr(process,"patJetsAK8Puppi"+postfix).addTagInfos = cms.bool(False)
 
 
 
@@ -128,9 +136,9 @@ def applySubstructure( process ) :
     
     ## PATify CHS soft drop fat jets
     addJetCollection(
-        process,
+        process, postfix=postfix,
         labelName = 'AK8PFCHSSoftDrop',
-        jetSource = cms.InputTag('ak8PFJetsCHSSoftDrop'),
+        jetSource = cms.InputTag('ak8PFJetsCHSSoftDrop'+postfix),
         btagDiscriminators = ['None'],
         jetCorrections = ('AK8PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None'),
         getJetMCFlavour = False # jet flavor disabled
@@ -139,9 +147,9 @@ def applySubstructure( process ) :
 
     ## PATify puppi soft drop fat jets
     addJetCollection(
-        process,
+        process, postfix=postfix,
         labelName = 'AK8PFPuppiSoftDrop',
-        jetSource = cms.InputTag('ak8PFJetsPuppiSoftDrop'),
+        jetSource = cms.InputTag('ak8PFJetsPuppiSoftDrop'+postfix),
         btagDiscriminators = ['None'],
         jetCorrections = ('AK8PFPuppi', ['L2Relative', 'L3Absolute'], 'None'),
         getJetMCFlavour = False # jet flavor disabled
@@ -149,9 +157,9 @@ def applySubstructure( process ) :
     
     ## PATify soft drop subjets
     addJetCollection(
-        process,
+        process, postfix=postfix,
         labelName = 'AK8PFPuppiSoftDropSubjets',
-        jetSource = cms.InputTag('ak8PFJetsPuppiSoftDrop','SubJets'),
+        jetSource = cms.InputTag('ak8PFJetsPuppiSoftDrop'+postfix,'SubJets'),
         algo = 'ak',  # needed for subjet flavor clustering
         rParam = 0.8, # needed for subjet flavor clustering
         btagDiscriminators = ['pfCombinedSecondaryVertexV2BJetTags', 'pfCombinedInclusiveSecondaryVertexV2BJetTags','pfCombinedMVAV2BJetTags'],
@@ -159,15 +167,16 @@ def applySubstructure( process ) :
         explicitJTA = True,  # needed for subjet b tagging
         svClustering = True, # needed for subjet b tagging
         genJetCollection = cms.InputTag('slimmedGenJets'), 
-        fatJets=cms.InputTag('ak8PFJetsPuppi'),             # needed for subjet flavor clustering
-        groomedFatJets=cms.InputTag('ak8PFJetsPuppiSoftDrop') # needed for subjet flavor clustering
+        fatJets=cms.InputTag('ak8PFJetsPuppi'+postfix),             # needed for subjet flavor clustering
+        groomedFatJets=cms.InputTag('ak8PFJetsPuppiSoftDrop'+postfix) # needed for subjet flavor clustering
     )
     process.selectedPatJetsAK8PFPuppiSoftDrop.cut = cms.string("pt > 170")
     process.patJetsAK8PFPuppiSoftDropSubjets.userData.userFloats.src += ['NjettinessAK8Subjets:tau1','NjettinessAK8Subjets:tau2','NjettinessAK8Subjets:tau3']
     
-    process.slimmedJetsAK8PFPuppiSoftDropSubjets = cms.EDProducer("PATJetSlimmer",
-        src = cms.InputTag("selectedPatJetsAK8PFPuppiSoftDropSubjets"),
-        packedPFCandidates = cms.InputTag("packedPFCandidates"),
+    setattr(process,"slimmedJetsAK8PFPuppiSoftDropSubjets"+postfix,
+            cms.EDProducer("PATJetSlimmer",
+        src = cms.InputTag("selectedPatJetsAK8PFPuppiSoftDropSubjets"+postfix),
+        packedPFCandidates = cms.InputTag("packedPFCandidates"+postfix),
         dropJetVars = cms.string("1"),
         dropDaughters = cms.string("0"),
         rekeyDaughters = cms.string("1"),
@@ -175,15 +184,17 @@ def applySubstructure( process ) :
         dropSpecific = cms.string("1"),
         dropTagInfos = cms.string("1"),
         modifyJets = cms.bool(True),
+        mixedDaughters = cms.bool(False),
         modifierConfig = cms.PSet( modifications = cms.VPSet() )
-    )
+    ) )
 
     
     ## Establish references between PATified fat jets and subjets using the BoostedJetMerger
-    process.slimmedJetsAK8PFPuppiSoftDropPacked = cms.EDProducer("BoostedJetMerger",
-        jetSrc=cms.InputTag("selectedPatJetsAK8PFPuppiSoftDrop"),
-        subjetSrc=cms.InputTag("slimmedJetsAK8PFPuppiSoftDropSubjets")
-    )
+    setattr(process,"slimmedJetsAK8PFPuppiSoftDropPacked"+postfix,
+            cms.EDProducer("BoostedJetMerger",
+        jetSrc=cms.InputTag("selectedPatJetsAK8PFPuppiSoftDrop"+postfix),
+        subjetSrc=cms.InputTag("slimmedJetsAK8PFPuppiSoftDropSubjets"+postfix)
+    ) )
 
     
     process.packedPatJetsAK8 = cms.EDProducer("JetSubstructurePacker",
@@ -196,9 +207,18 @@ def applySubstructure( process ) :
                 'SoftDropPuppi'
                 ),
             fixDaughters = cms.bool(True),
-            packedPFCandidates = cms.InputTag("packedPFCandidates"),
-    )
+            packedPFCandidates = cms.InputTag("packedPFCandidates"+postfix), #oldPFCandToPackedOrDiscarded #"packedPFCandidates"+postfix
+    ) )
+
+
+    #if the slimmedJet collection is not here, produce it
+    if not hasattr(process, "slimmedJetsAK8"+postfix):
+        from PhysicsTools.PatAlgos.slimming.slimmedJets_cfi import slimmedJetsAK8
+        setattr(process, "slimmedJetsAK8"+postfix, slimmedJetsAK8.clone(
+                src = cms.InputTag("packedPatJetsAK8"+postfix),
+                packedPFCandidates = cms.InputTag("packedPFCandidates"), #MM FIXME
+                ) )
 
     # switch off daughter re-keying since it's done in the JetSubstructurePacker (and can't be done afterwards)
-    process.slimmedJetsAK8.rekeyDaughters = "0"
+    getattr(process,"slimmedJetsAK8"+postfix).rekeyDaughters = "0"
 

@@ -233,4 +233,3 @@ void CastorRawToDigi::beginRun(edm::Run const& irun, edm::EventSetup const& es){
 		unpacker_.setExpectedOrbitMessageTime(expectedOrbitMessageTime_);
 	}
 }
-

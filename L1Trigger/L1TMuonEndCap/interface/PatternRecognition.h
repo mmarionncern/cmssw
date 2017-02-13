@@ -9,3 +9,5 @@ PatternOutput DetectPatterns(ZonesOutput Eout);
 std::vector<PatternOutput> Patterns(std::vector<ZonesOutput> Zones);
 
 void PrintQuality (QualityOutput out);
+
+#endif

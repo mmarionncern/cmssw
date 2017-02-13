@@ -520,7 +520,6 @@ namespace HLTOfflineDQMTopDiLepton {
 	}	  	
 
 
-
         // loop over trigger paths 
 	for(unsigned int i=0; i<triggerNames.triggerNames().size(); ++i){
           // consider only path from triggerPaths

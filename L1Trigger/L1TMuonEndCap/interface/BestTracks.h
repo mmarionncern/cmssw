@@ -7,7 +7,8 @@ Author: Matthew R. Carver
 Date: 7/29/13
 */
 
-#include "L1Trigger/L1TMuonEndCap/interface/EmulatorClasses.h"
+#ifndef ADD_BESTTRACK
+#define ADD_BESTTRACK
 
 
 std::vector<BTrack> BestTracks(DeltaOutArr2 Dout){

@@ -18,8 +18,8 @@ PythiaFilterHT::PythiaFilterHT(const edm::ParameterSet& iConfig) :
 	maxrapcut(iConfig.getUntrackedParameter("MaxRapidity", 20.)),
 	minphicut(iConfig.getUntrackedParameter("MinPhi", -3.5)),
 	maxphicut(iConfig.getUntrackedParameter("MaxPhi", 3.5)),*/
-	minhtcut(iConfig.getUntrackedParameter("MinHT", 0.)),
-	motherID(iConfig.getUntrackedParameter("MotherID", 0)) {
+	minhtcut(iConfig.getUntrackedParameter<double>("MinHT", 0.)),
+	motherID(iConfig.getUntrackedParameter<int>("MotherID", 0)) {
 
 		theNumberOfTestedEvt = 0;
 		theNumberOfSelected = 0;

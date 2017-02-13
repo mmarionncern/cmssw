@@ -5,6 +5,10 @@
 //////
 //////
 
+#ifndef ADD_SortSector
+#define ADD_SortSector
+
+
 #include "L1Trigger/L1TMuonEndCap/interface/PhiMemoryImage.h"
 #include "L1Trigger/L1TMuonEndCap/interface/EmulatorClasses.h"
 

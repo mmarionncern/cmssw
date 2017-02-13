@@ -113,3 +113,5 @@ int getCharge(int phi1, int phi2, int phi3, int phi4, int mode){
   return charge;
   
 }
+
+#endif

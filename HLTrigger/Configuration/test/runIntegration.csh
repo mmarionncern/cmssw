@@ -20,7 +20,7 @@ else if ( $2 == FULL ) then
 else if ( $2 == FAKE ) then
   set tables = ( Fake Fake1 )
 else if ( $2 == FROZEN ) then
-  set tables = ( Fake Fake1 )
+  set tables = ( 25ns15e33_v4 25ns10e33_v2 Fake Fake1 )
 else
   set tables = ( $2 )
 endif

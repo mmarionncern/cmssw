@@ -529,6 +529,15 @@ void SiPixelTrackResidualSource::bookHistograms(DQMStore::IBooker & iBooker, edm
     meNofClustersvsPhiOnTrack_layers.at(i-1)->setAxisTitle("Number of Clusters/Layer on Track",2);
   }
 
+ for (int i = 1; i <= noOfLayers; i++)
+  {
+    ss1.str(std::string()); ss1 << "nclustersvsPhi_" + clustersrc_.label() + "_Layer_" << i;
+    ss2.str(std::string()); ss2 << "nclusters (on track, layer" << i << ")";
+    meNofClustersvsPhiOnTrack_layers.push_back(iBooker.book1D(ss1.str(),ss2.str(),1400.,-3.5,3.5));
+    meNofClustersvsPhiOnTrack_layers.at(i-1)->setAxisTitle("Global #Phi",1);
+    meNofClustersvsPhiOnTrack_layers.at(i-1)->setAxisTitle("Number of Clusters/Layer on Track",2);
+  }
+
   //fpix
   for (int i = 1; i <= noOfDisks; i++)
   {

@@ -326,6 +326,8 @@ def customizeHLTforMC(process,_fastSim=False):
 
       "hltPAGoodHighPurityFullTracks",
 
+      "hltPAGoodHighPurityFullTracks",
+
       #   "hltPixelMatchElectronsActivity",
 
       "hltMuonCSCDigis",

@@ -409,7 +409,6 @@ void CSCDCCUnpacker::produce(edm::Event & e, const edm::EventSetup& c)
 
 		  // if (cscData.size() != 0) std::cout << "FED" << id << " DDU Source ID: " << dduData[iDDU].header().source_id() << " firmware version: " << dduData[iDDU].header().format_version() << std::endl;
 
-
                   for (unsigned int iCSC=0; iCSC<cscData.size(); ++iCSC)   // loop over CSCs
                     {
 

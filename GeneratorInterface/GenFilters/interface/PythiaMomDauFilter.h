@@ -35,6 +35,9 @@ namespace edm {
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+namespace edm {
+      class HepMCProduct;
+}
 
 //
 // class decleration

@@ -425,6 +425,9 @@ def customizeHLTforCMSSW(process, menuType="GRun"):
     import os
     cmsswVersion = os.environ['CMSSW_VERSION']
 
+    if cmsswVersion >= "CMSSW_8_0":
+        process = customiseFor15439(process)
+
     if cmsswVersion >= "CMSSW_8_1":
       if menuType == "25ns15e33_v4":
         print "# Applying 81X customization for ",menuType

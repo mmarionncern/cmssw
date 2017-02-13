@@ -30,6 +30,9 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+namespace edm {
+    class HepMCProduct;
+}
 
 namespace edm {
     class HepMCProduct;
